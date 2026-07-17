@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Guess The Number | Premium Edition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body data-theme="dark">
+
+  <!-- Loading Screen -->
+  <div class="loader" id="loader">
+    <div class="loader-orb"></div>
+    <p class="loader-text">Calibrating the number generator…</p>
+  </div>
+
+  <!-- Animated Background -->
+  <div class="bg-scene" aria-hidden="true">
+    <div class="gradient-layer"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="particles" id="particles"></div>
+  </div>
+
+  <!-- Top Bar -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-dot"></span>
+      <span>NumberQuest</span>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="soundToggle" title="Toggle sound" aria-label="Toggle sound">🔊</button>
+      <button class="icon-btn" id="themeToggle" title="Toggle theme" aria-label="Toggle theme">🌙</button>
+    </div>
+  </header>
+
+  <main class="stage">
+
+    <!-- Difficulty Selector -->
+    <div class="difficulty-bar" role="group" aria-label="Difficulty level">
+      <button class="diff-btn active" data-min="1" data-max="50" data-label="Easy">🟢 Easy <span>1–50</span></button>
+      <button class="diff-btn" data-min="1" data-max="100" data-label="Medium">🟡 Medium <span>1–100</span></button>
+      <button class="diff-btn" data-min="1" data-max="500" data-label="Hard">🔴 Hard <span>1–500</span></button>
+    </div>
+
+    <!-- Main Card -->
+    <section class="card" id="gameCard">
+      <div class="card-glow" id="cardGlow"></div>
+
+      <div class="card-header">
+        <h1 class="title">🎯 Guess The Number</h1>
+        <p class="subtitle" id="subtitle">I'm thinking of a number between <strong id="rangeText">1</strong> and <strong id="rangeMax">50</strong>. Can you guess it?</p>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="stats-row">
+        <div class="stat-chip">
+          <span class="stat-label">Attempts</span>
+          <span class="stat-value" id="attemptsVal">0</span>
+        </div>
+        <div class="stat-chip">
+          <span class="stat-label">Score</span>
+          <span class="stat-value" id="scoreVal">100</span>
+        </div>
+        <div class="stat-chip">
+          <span class="stat-label">Best Score</span>
+          <span class="stat-value" id="bestScoreVal">--</span>
+        </div>
+        <div class="stat-chip">
+          <span class="stat-label">Time</span>
+          <span class="stat-value" id="timerVal">0:00</span>
+        </div>
+      </div>
+
+      <!-- Input Section -->
+      <form class="guess-form" id="guessForm" autocomplete="off">
+        <div class="input-wrap" id="inputWrap">
+          <input
+            type="text"
+            inputmode="numeric"
+            id="guessInput"
+            placeholder="Enter your guess..."
+            aria-label="Enter your guess"
+          />
+          <div class="input-glow"></div>
+        </div>
+        <div class="btn-row">
+          <button type="submit" class="btn btn-primary" id="guessBtn">
+            <span>Guess</span>
+          </button>
+          <button type="button" class="btn btn-secondary hidden" id="playAgainBtn">
+            <span>🔄 Play Again</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- Error Message -->
+      <p class="error-msg" id="errorMsg" role="alert"></p>
+
+      <!-- Hint -->
+      <div class="hint-box" id="hintBox">
+        <span class="hint-icon" id="hintIcon">👋</span>
+        <span class="hint-text" id="hintText">Make your first guess to begin the hunt.</span>
+      </div>
+
+      <!-- Progress Bar (closeness meter) -->
+      <div class="progress-wrap">
+        <div class="progress-label">
+          <span>Cold</span>
+          <span id="progressPercent">0%</span>
+          <span>Hot 🔥</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+
+      <!-- Motivational message -->
+      <p class="motivation" id="motivation"></p>
+
+      <!-- Win Panel -->
+      <div class="win-panel hidden" id="winPanel">
+        <div class="win-emoji">🎉</div>
+        <h2>You Cracked It!</h2>
+        <div class="win-stats">
+          <div class="win-stat">
+            <span class="win-stat-label">Number</span>
+            <span class="win-stat-value" id="winNumber">--</span>
+          </div>
+          <div class="win-stat">
+            <span class="win-stat-label">Attempts</span>
+            <span class="win-stat-value" id="winAttempts">--</span>
+          </div>
+          <div class="win-stat">
+            <span class="win-stat-label">Final Score</span>
+            <span class="win-stat-value" id="winScore">--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Guess History -->
+      <details class="history-panel" id="historyPanel">
+        <summary>📜 Guess History <span id="historyCount">(0)</span></summary>
+        <div class="history-list" id="historyList"></div>
+      </details>
+    </section>
+
+    <!-- Global Stats Panel -->
+    <section class="global-stats">
+      <h3>📊 Your Statistics</h3>
+      <div class="global-stats-grid">
+        <div class="gstat">
+          <span class="gstat-value" id="gamesPlayed">0</span>
+          <span class="gstat-label">Games Played</span>
+        </div>
+        <div class="gstat">
+          <span class="gstat-value" id="gamesWon">0</span>
+          <span class="gstat-label">Games Won</span>
+        </div>
+        <div class="gstat">
+          <span class="gstat-value" id="avgAttempts">0</span>
+          <span class="gstat-label">Avg. Attempts</span>
+        </div>
+        <div class="gstat">
+          <span class="gstat-value" id="highestScore">0</span>
+          <span class="gstat-label">Highest Score</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <canvas id="confettiCanvas"></canvas>
+
+  <footer class="footer">
+    <p>Crafted with 💜 by <strong>NumberQuest Studio</strong> — a premium guessing experience, built with pure HTML, CSS &amp; JavaScript.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
